@@ -1,0 +1,339 @@
+##1
+SELECT table_name AS 'TableName',
+                 ROUND(SUM(data_length+index_length)/(1024*1024), 2) AS 'All(MB)',
+                 ROUND(data_length/(1024*1024), 2) AS 'Data(MB)',
+                 ROUND(index_length/(1024*1024), 2) AS 'Index(MB)'
+FROM information_schema.tables
+GROUP BY table_name
+ORDER BY data_length DESC;
+
+##2
+alter table tb_kfs_cmfr_m_nonesb add constraint foreign key (LCTN_SPTL_CONNO) references tb_kfs_lctn_sptl_info_m_nonesb(LCTN_SPTL_CONNO) on delete cascade;
+
+alter table tb_gb_prtcpnt_excut_detail_job_d
+add constraint PRTCPNT_EXCUT_IDX
+foreign key (PRTCPNT_EXCUT_IDX)
+references tb_gb_prtcpnt_excut_cn_m(PRTCPNT_EXCUT_IDX) on delete cascade;
+
+##3
+alter table tb_kfs_cmfr_m_nonesb drop foreign key tb_kfs_cmfr_m_nonesb_ibfk_1;
+
+##4
+grant all privileges on fowi_test.* to fowi_dataset@'%' IDENTIFIED by '1q2w3e4r!';
+
+##5
+select
+	*
+from (
+	select 
+		case when A.CMFR_CONNO is not null then
+			A.CMFR_CONNO
+			else null 
+		end as CMFR_CONNO_NEW
+		, B.CMFR_CONNO as CMFR_CONNO_B
+		, A.CMFR_CONNO as CMFR_CONNO_A
+		, A.CMFR_MK_YR
+		, A.CMFR_DETL_BSNSS_NM
+		, A.CMFR_ADDR
+	from
+		tb_kfs_cmfr_m A
+		left join tb_kfs_cmfr_m_nonesb B on A.CMFR_MK_YR = B.CMFR_MK_YR and A.CMFR_DETL_BSNSS_NM = B.CMFR_DETL_BSNSS_NM and (A.CMFR_ADDR = B.CMFR_ADDR or B.CMFR_ADDR is null) 
+	) A
+where 
+	1=1
+order by 
+	CMFR_CONNO_B asc;
+
+##6
+select 
+	case 
+		when (tn.MMBER_ID is not null)
+			then tn.MMBER_ID
+		else null 
+	end as MMBER_ID_NEW,
+to2.MMBER_ID as MMBER_ID_OLD,
+to2.MMBER_SXDST_NM ,
+to2.MMBER_BIRTH_YR ,
+to2.MMBER_ADDR_SCTIN_NM ,
+to2.LTNO_ADDR ,
+tn.ROAD_NM_ADDR
+from tb_newmmber tn
+		left join
+		 tb_oldmmber to2
+on to2.MMBER_ID = tn.MMBER_ID ;
+
+##7
+select *
+from information_schema.TABLE_CONSTRAINTS
+where CONSTRAINT_SCHEMA = 'fowi_live';
+
+select * from information_schema.table_constraints where table_name = 'tb_gb_prtcpnt_excut_cn_m';
+
+##8
+SELECT 
+    table_name, table_comment
+FROM
+    information_schema.tables
+WHERE
+    table_schema = 'fowiform' AND table_name = '';
+
+##9
+SELECT
+		EXISTS(
+				SELECT 
+					CD_NM, UPPER_CD_IDX 
+				FROM
+					tb_gb_cd_list_m
+				WHERE
+					CD_NM = #{cdNm}
+				AND (
+						<choose>
+							<when test="upperCdIdx != null">
+								UPPER_CD_IDX = #{upperCdIdx} OR
+							</when>
+						</choose>
+						UPPER_CD_IDX is null
+					)
+			);
+
+SELECT
+	exists	(
+				SELECT CODE_NM, UPPER_CODE_IDX 
+				FROM code
+				WHERE CODE_NM = '대분류1'
+				and (UPPER_CODE_IDX is null or UPPER_CODE_IDX = 'CD_5')
+			) AS SUCCESS;
+			
+##10
+show variables like 'c%';
+
+##11
+SELECT
+			A.CODE_IDX, 
+			A.CODE_ID,
+			A.UPPER_CODE_IDX,
+			A.CODE_NAME,
+			A.CODE_CN,
+			A.SORT_ORDR,
+			A.CODE_IMG,
+			A.INS_DTTM,
+			A.INS_IDX,
+			A.INS_IP,
+			A.UPT_DTTM,
+			A.UPT_IDX,
+			A.UPT_IP,
+			A.DEL_DTTM,
+			A.DEL_IDX,
+			A.DEL_IP,
+				(select count(B.CODE_IDX)
+				from tb_code B
+				where B.UPPER_CODE_IDX = A.CODE_IDX)
+				as LOWER_CODE_CNT
+		FROM
+			tb_code A
+		WHERE
+			A.UPPER_CODE_IDX IS NULL
+		AND
+			A.DEL_DTTM IS null
+		LIMIT
+			0, 10;
+			
+##12
+select count(ins_dttm)
+from tb_member
+where INS_DTTM 
+between date_add(now(), interval-1 month) and now();
+
+##13
+select date_add(now(), interval-1 month);
+
+##14
+select a.PERIOD_DATE, (select count(ins_dttm) from tb_member where DATE_FORMAT(ins_dttm, '%Y-%m-%d') = a.PERIOD_DATE) as NEW_MEM_COUNT
+from (
+    select curdate() - INTERVAL (a.a + (10 * b.a) + (100 * c.a) + (1000 * d.a) ) DAY as PERIOD_DATE
+    from (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as a
+    cross join (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as b
+    cross join (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as c
+    cross join (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as d
+	) a
+where a.PERIOD_DATE between now() - interval 30 day and now();
+
+##15
+select count(ins_dttm) from tb_member where DATE_FORMAT(ins_dttm, '%Y-%m-%d') = '2021-01-31';
+
+select 
+	distinct bvr.BBS, DATE_FORMAT(bvr.INS_DTTM, '%Y-%m-%d') as INS_DTTM, (select count(INS_DTTM)
+			from tb_bbs_visit_record bvrs
+			where bvr.BBS = bvrs.BBS
+			) as VISIT_COUNT
+FROM 
+	tb_bbs_visit_record bvr;
+
+##16
+SELECT a.PERIOD_DATE, (SELECT 
+							COUNT(INS_DTTM)
+					   FROM 
+							tb_flea_market
+					   WHERE 
+							DATE_FORMAT(INS_DTTM, '%Y-%m-%d') = a.PERIOD_DATE
+					  ) as NEW_FLEA_MARKET_COUNT,
+					  							(SELECT 
+					  								COUNT(INS_DTTM)
+					  							 FROM
+					  							 	tb_together_bbs
+					  							 WHERE
+					  							 	DATE_FORMAT(INS_DTTM, '%Y-%m-%d') = a.PERIOD_DATE 
+					  							) as NEW_TOGETHER_BBS_COUNT,
+					  														(SELECT 
+					  															COUNT(INS_DTTM)
+												  							 FROM
+					  														 	tb_together_bbs
+					  							 							 WHERE
+					  							 								DATE_FORMAT(INS_DTTM, '%Y-%m-%d') = a.PERIOD_DATE 
+					  														) as NEW_FISHING_BBS_COUNT
+FROM
+	(SELECT CURDATE() - INTERVAL (a.a + (10 * b.a) + (100 * c.a) + (1000 * d.a) ) DAY as PERIOD_DATE
+     FROM (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as a
+     CROSS JOIN (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as b
+     CROSS JOIN (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as c
+     CROSS JOIN (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as d
+	) a
+WHERE a.PERIOD_DATE BETWEEN now() - interval 30 day AND now();
+
+##17
+SELECT
+	   			(SELECT COUNT(INS_DTTM)
+				 FROM tb_spot
+				 WHERE BAN_AT = 'Y'
+				 AND DATE_FORMAT(INS_DTTM, '%Y-%m-%d') BETWEEN now() - interval 30 day AND now()) as spotBan,
+												(SELECT COUNT(INS_DTTM)
+							 					 FROM tb_spot
+							 					 WHERE BAN_AT = 'N'
+							 					 AND SPOT_CODE = 2
+							 					 AND DATE_FORMAT(INS_DTTM, '%Y-%m-%d') BETWEEN now() - interval 30 day AND now()) as spotFresh,
+																				(SELECT COUNT(INS_DTTM)
+												 								 FROM tb_spot
+												 								 WHERE BAN_AT = 'N'
+												 								 AND SPOT_CODE = 3
+												 								 AND DATE_FORMAT(INS_DTTM, '%Y-%m-%d') BETWEEN now() - interval 30 day AND now()) as spotSea;
+
+# bbs visit record																				 
+SELECT a.PERIOD_DATE, (SELECT 
+							COUNT(INS_DTTM)
+					   FROM 
+							tb_bbs_visit_record
+					   WHERE 
+							DATE_FORMAT(INS_DTTM, '%Y-%m-%d') = a.PERIOD_DATE
+					   AND
+					   		BBS = 'notice'
+					  ) as VISIT_NOTICE_COUNT,
+					  							(SELECT 
+					  								COUNT(INS_DTTM)
+					  							 FROM
+					  							 	tb_bbs_visit_record
+					  							 WHERE
+					  							 	DATE_FORMAT(INS_DTTM, '%Y-%m-%d') = a.PERIOD_DATE
+					  							 AND
+					   								BBS = 'guide'
+					  							) as VISIT_GUIDE_COUNT,
+					  														(SELECT 
+					  															COUNT(INS_DTTM)
+												  							 FROM
+					  														 	tb_bbs_visit_record
+					  							 							 WHERE
+					  							 								DATE_FORMAT(INS_DTTM, '%Y-%m-%d') = a.PERIOD_DATE
+					  							 							 AND
+					   															BBS = 'league'
+					  														) as VISIT_LEAGUE_COUNT, 
+					  																				(SELECT 
+					  																					COUNT(INS_DTTM)
+												  							 						 FROM
+					  														 							tb_bbs_visit_record
+					  							 							 						 WHERE
+					  							 														DATE_FORMAT(INS_DTTM, '%Y-%m-%d') = a.PERIOD_DATE
+					  							 							 						 AND
+					   																					BBS = 'fleamarket'
+					  																				) as VISIT_FLEAMARKET_COUNT, 
+					  																											(SELECT 
+					  																												COUNT(INS_DTTM)
+												  							 													 FROM
+					  														 														tb_bbs_visit_record
+					  							 							 						 							 WHERE
+					  							 																					DATE_FORMAT(INS_DTTM, '%Y-%m-%d') = a.PERIOD_DATE
+					  							 							 													 AND
+					   																												BBS = 'together'
+					  																											) as VISIT_TOGETHER_COUNT, 
+					  																																		(SELECT 
+					  																																			COUNT(INS_DTTM)
+												  							 													 							 FROM
+					  														 																					tb_bbs_visit_record
+					  							 							 						 							 							 WHERE
+					  							 																												DATE_FORMAT(INS_DTTM, '%Y-%m-%d') = a.PERIOD_DATE
+					  							 							 													 							 AND
+					   																																			BBS = 'fishing'
+					  																																		) as VISIT_FISHING_COUNT
+FROM
+	(SELECT CURDATE() - INTERVAL (a.a + (10 * b.a) + (100 * c.a) + (1000 * d.a) ) DAY as PERIOD_DATE
+     FROM (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as a
+     CROSS JOIN (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as b
+     CROSS JOIN (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as c
+     CROSS JOIN (select 9 as a union all select 8 union all select 7 union all select 6 union all select 5 union all select 4 union all select 3 union all select 2 union all select 1 union all select 0) as d
+	) a
+WHERE a.PERIOD_DATE BETWEEN now() - interval 30 day AND now();
+
+# final
+SELECT 				 
+					 (SELECT 
+							COUNT(INS_DTTM)
+					   FROM 
+							tb_bbs_visit_record
+					   WHERE 
+							DATE_FORMAT(INS_DTTM, '%Y-%m-%d') BETWEEN now() - interval 30 day AND now()
+					   AND
+					   		BBS = 'notice'
+					  ) as VISIT_NOTICE_COUNT,
+					  							(SELECT 
+					  								COUNT(INS_DTTM)
+					  							 FROM
+					  							 	tb_bbs_visit_record
+					  							 WHERE
+					  							 	DATE_FORMAT(INS_DTTM, '%Y-%m-%d') BETWEEN now() - interval 30 day AND now()
+					  							 AND
+					   								BBS = 'guide'
+					  							) as VISIT_GUIDE_COUNT,
+					  														(SELECT 
+					  															COUNT(INS_DTTM)
+												  							 FROM
+					  														 	tb_bbs_visit_record
+					  							 							 WHERE
+					  							 								DATE_FORMAT(INS_DTTM, '%Y-%m-%d') BETWEEN now() - interval 30 day AND now()
+					  							 							 AND
+					   															BBS = 'league'
+					  														) as VISIT_LEAGUE_COUNT, 
+					  																				(SELECT 
+					  																					COUNT(INS_DTTM)
+												  							 						 FROM
+					  														 							tb_bbs_visit_record
+					  							 							 						 WHERE
+					  							 														DATE_FORMAT(INS_DTTM, '%Y-%m-%d') BETWEEN now() - interval 30 day AND now()
+					  							 							 						 AND
+					   																					BBS = 'fleamarket'
+					  																				) as VISIT_FLEAMARKET_COUNT, 
+					  																											(SELECT 
+					  																												COUNT(INS_DTTM)
+												  							 													 FROM
+					  														 														tb_bbs_visit_record
+					  							 							 						 							 WHERE
+					  							 																					DATE_FORMAT(INS_DTTM, '%Y-%m-%d') BETWEEN now() - interval 30 day AND now()
+					  							 							 													 AND
+					   																												BBS = 'together'
+					  																											) as VISIT_TOGETHER_COUNT, 
+					  																																		(SELECT 
+					  																																			COUNT(INS_DTTM)
+												  							 													 							 FROM
+					  														 																					tb_bbs_visit_record
+					  							 							 						 							 							 WHERE
+					  							 																												DATE_FORMAT(INS_DTTM, '%Y-%m-%d') BETWEEN now() - interval 30 day AND now()
+					  							 							 													 							 AND
+					   																																			BBS = 'fishing'
+					  																																		) as VISIT_FISHING_COUNT;

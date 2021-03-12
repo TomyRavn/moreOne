@@ -1,0 +1,2 @@
+because "this.fileService" is null 오류는
+@Autowired 체크

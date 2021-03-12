@@ -1,0 +1,5 @@
+No converter found for return value of type: class java.util.ArrayList
+
+@ResponseBody 어노테이션 사용해서 List<>를 반환할 때 발생
+
+jackson-bind 라이브러리 추가

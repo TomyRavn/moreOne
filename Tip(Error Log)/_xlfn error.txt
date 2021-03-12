@@ -1,0 +1,2 @@
+'_xlfn.CONCAT' 등 _xlfn error 는 현재 poi 버전에서 해당하는 엑셀 수식을 지원하지 않기 때문에 발생,
+poi 버전을 변경하거나 수식 변경 cellRef에서 IllegalException 처리

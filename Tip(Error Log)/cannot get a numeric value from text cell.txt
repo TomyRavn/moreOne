@@ -1,0 +1,5 @@
+엑셀의 형이 일치하지 않아 발생
+
+cellref에서 illegal exception 처리 및
+
+FALSE와 같은 문자가 formula로 인식되어, cell을 getNumericValue -> getStringValue로 변경

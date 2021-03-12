@@ -1,0 +1,7 @@
+Json parse 사용 시 에러
+
+JSON 형식이 아니거나
+""/''/, 등이 해당 data에 포함되거나하여
+JSON 형식이 깨지는 경우 발생
+
+replaceAll을 통해 수정

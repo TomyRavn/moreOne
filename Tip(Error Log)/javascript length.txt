@@ -1,0 +1,11 @@
+Cannot read property 'length' of undefined 
+
+Cannot read property 아무거나 undefined 
+
+이런식으로 에러가 뜨면
+
+'length'  랭스 넘어온 값이 랭스가 아니라는 것
+
+리스트 형태가 아닌데 리스트로 뺄려고 할때 문제가 되거나
+
+랭스값보다 과도하게 포문이 돌고 있거나 기타등등
