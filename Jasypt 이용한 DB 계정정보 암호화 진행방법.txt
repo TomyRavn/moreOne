@@ -1,0 +1,36 @@
+DB 접속 계정정보 암호화
+
+사용한 java version : jdk 1.8.0_151
+높으면 안됨
+
+- pom.xml -
+<dependency>
+	<groupId>org.jasypt</groupId>
+	<artifactId>jasypt-spring31</artifactId>
+	<version>1.9.2</version>
+</dependency>
+
+- globals.properties -
+Globals.mysql.UserName = ENC(1L07ZSAfovOlsby5/ontFg==)
+Globals.mysql.Password = ENC(FhmSaD9b8ATNnjsPE2Pu0MDjfrZAwLD2)
+
+#Globals.mysql.Url=ENC(K4H6g8LcaWrZu1+1E0Vp7pESWvM3sleL6Ym1dF6F6ehWViyWd3xscCxxG5TWg+FW)
+
+- context-datasource.xml -
+<!-- Jasypt -->
+<bean id="environmentVariablesConfiguration" class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+	<property name="algorithm" value="PBEWITHMD5ANDDES" />
+	<property name="passwordEnvName" value="APP_ENCRYPTION_PASSWORD"/>
+</bean>
+	
+<bean id="configurationEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+	<property name="config" ref="environmentVariablesConfiguration" />
+</bean>
+	
+<bean id="propertyConfig" class="org.jasypt.spring31.properties.EncryptablePropertyPlaceholderConfigurer">
+	<constructor-arg ref="configurationEncryptor"/>
+	<property name="location" value="classpath:/egovframework/egovProps/globals.properties"/>
+</bean>
+
+- eclipse 환경변수 설정 -
+프로젝트 우클릭 > Run as > Run Configurations > Tomcat > Environment > Variable : APP_ENCRYPTION_PASSWORD, Value : 키 값
