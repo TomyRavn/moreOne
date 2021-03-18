@@ -1,0 +1,19 @@
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException: Cannot create PoolableConnectionFactory (Communications link failure
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.)]을(를) 발생시켰습니다.
+java.net.ConnectException: Connection timed out: connect
+
+
+DB 연결이 제대로 되지 않는 상태이거나,
+
+--- dataSource 내용 변경 후 ---
+
+<!-- JDBC dataSource 설정. 톰캣 server.xml 설정하듯이. -->
+<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+	<property name="driverClass" value="com.mysql.jdbc.Driver"/>
+	<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/we2?characterEncoding=utf8&amp;useSSL=false&amp;autoReconnection=true" />
+	<property name="user" value="we2admin" />
+	<property name="password" value="1234" />
+</bean>
+
+와 같이 autoReconnection=true 추가
