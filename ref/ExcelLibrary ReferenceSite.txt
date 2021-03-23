@@ -1,0 +1,15 @@
+= excel library reference site =
+
+- list : https://bashooka.com/coding/10-best-javascript-spreadsheet-libraries/
+
+1.
+https://www.jqueryscript.net/table/Export-Html-Table-To-Excel-Spreadsheet-using-jQuery-table2excel.html
+https://frontendscript.com/export-html-table-to-xlsx-using-jquery/
+https://xlsxwriter.readthedocs.io/working_with_dates_and_time.html
+
+2.
+https://github.com/SheetJS/sheetjs/blob/3468395494c450ea8ba7e20afb1bd6127f516ccd/README.md
+https://eblo.tistory.com/84
+
+3.
+https://github.com/rainabba/jquery-table2excel/issues/1
