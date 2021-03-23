@@ -1,0 +1,330 @@
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
+<c:import url="/template/iframe_top.do" charEncoding="utf-8">
+	<c:param name="title" value="고객정보" />
+</c:import>
+
+<!-- ax5ui -->
+<link rel="stylesheet" type="text/css" href="/template/ax5ui/dist/ax5grid.css">
+<link rel="stylesheet" type="text/css" href="/template/ax5ui/dist/ax5calendar.css">
+<link rel="stylesheet" type="text/css" href="/template/ax5ui/dist/ax5formatter.css">
+<link rel="stylesheet" type="text/css" href="/template/ax5ui/dist/ax5picker.css">
+<link rel="stylesheet" type="text/css" href="/template/ax5ui/dist/ax5select.css">
+<link rel="stylesheet" type="text/css" href="/template/ax5ui/dist/ax5ui.all.css">
+<script type="text/javascript" src="/template/ax5ui/dist/ax5core.min.js"></script>
+<script type="text/javascript" src="/template/ax5ui/dist/ax5grid.min.js"></script>
+<script type="text/javascript" src="/template/ax5ui/dist/ax5calendar.min.js"></script>
+<script type="text/javascript" src="/template/ax5ui/dist/ax5formatter.min.js"></script>
+<script type="text/javascript" src="/template/ax5ui/dist/ax5picker.min.js"></script>
+<script type="text/javascript" src="/template/ax5ui/dist/ax5select.min.js"></script>
+<script type="text/javascript" src="/template/ax5ui/dist/ax5ui.all.min.js"></script>
+<script type="text/javascript" src="/template/sheetjs/dist/xlsx.full.min.js"></script>
+<script type="text/javascript" src="/template/fileSaver/dist/FileSaver.min.js"></script>
+
+<style>
+.custom-table_content .chart2 tbody th, 
+.custom-table_content .chart2 tbody .th {
+	padding: 2px;
+}
+.custom-table_content .chart2 tbody td {
+	padding: 4px 2px;
+	text-align: center;
+}
+</style>
+
+
+<script>
+function convertFmt(obj){
+	return obj < 10 ? "0" + obj : obj;
+}
+
+function fnExcel(){
+// 	window.location.href = window.location.href.replace('/cstmr/view.do','/cstmr/excel.do');
+	const date = new Date();
+	const year = date.getFullYear();
+	let month = date.getMonth() + 1;
+	let day = date.getDate();
+	let hours = date.getHours();
+	let minutes = date.getMinutes();
+	let seconds = date.getSeconds();
+	
+	month = convertFmt(month); day = convertFmt(day); hours = convertFmt(hours); minutes = convertFmt(minutes); seconds = convertFmt(seconds);
+	const curDate = year + "_" + month + "_" + day + "_" + hours + "_" + minutes + "_" + seconds;
+
+	//1. ax5ui export	
+	//dataGrid.exportExcel("stat_cstmr_" + curDate + ".xls");
+
+	//2. sheetJS export
+	//common
+	const gridTableHtml = dataGrid.exportExcel();
+	$('#gridTable').html(gridTableHtml);
+	
+	console.log(document.getElementById('gridTable'));
+// 	$('#gridTable').css('display', 'block');
+	//(1) table_to_book
+// 	const wb = XLSX.utils.table_to_book(document.getElementById('gridTable'), {sheet:"sheet1", raw:false});
+// 	XLSX.writeFile(wb, ("stat_cstmr_" + curDate + ".xlsx"));
+	
+	//(2)
+// 	const excelHandler = {
+// 			getExcelFileName : function(){
+// 				return "stat_cstmr_" + curDate + ".xlsx";
+// 			},
+// 			getSheetName : function(){
+// 				return "sheet1";
+// 			},
+// 			getExcelData : function(){
+// 				return document.getElementById('gridTable');
+// 			},
+// 			getWorksheet : function(){
+// 				//보이는 형식만 변동(실제 데이터는 바뀌지 않음)
+// // 				return XLSX.utils.table_to_sheet(this.getExcelData(), {cellDates : false, dateNF : 'yyyy-mm-dd'});
+// 				return XLSX.utils.table_to_sheet(this.getExcelData());
+// 			}
+// 	}
+	
+// 	const wb = XLSX.utils.book_new();
+// 	const newWorksheet = excelHandler.getWorksheet();
+// 	XLSX.utils.book_append_sheet(wb, newWorksheet, excelHandler.getSheetName());
+	
+// 	var wbout = XLSX.write(wb, {bookType:'xlsx', type:'binary'});
+	
+// 	saveAs(new Blob([s2ab(wbout)], {type:"application/octet-stream"}), excelHandler.getExcelFileName());
+}
+
+function fnPrint(){
+	
+	window.onbeforeprint = function(){
+		$(".none-print").css('display','none');
+		$('#printTable').css('display', 'block');
+		$('#gridDiv').css('display', 'none');
+	}
+	
+	setTimeout(function(){window.print();}, 500);
+	
+	window.onafterprint = function(){
+		$('#printTable').css('display', 'none');
+		$('#gridDiv').css('display', 'block');
+		$(".none-print").css('display','block');
+	}
+	
+}
+
+function s2ab(s) { 
+    var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+    var view = new Uint8Array(buf);  //create uint8array as viewer
+    for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+    return buf;    
+}
+</script>
+
+<form name=""  method="post">
+<div class="row">
+	<div class="col-md-12 col-sm-12 col-xs-12">
+	
+		<div class="x_panel">
+			<div class="custom-title">
+				고객정보 관리 현황
+			</div>
+			
+			<div class="none-print" style="">
+				<button type="button" class="boot_btn boot_btn-danger register" style="border-color:#d43f3a;float: right;" onclick="self.close()">닫기</button>
+				<button type="button" class="boot_btn boot_btn-primary register" style="float: right;" onclick="fnPrint()">출력</button>
+				<button type="button" class="boot_btn boot_btn-primary register" style="float: right;" onclick="fnExcel()">엑셀</button>
+				<h2 style="border: none;width: 50%;display: inline-block;padding: 0;">검색 기간 : <c:out value="${vo.searchBgnDe }"/> ~ <c:out value="${vo.searchEndDe }"/></h2>
+			</div>
+			
+			<div data-ax5grid="data-grid"
+         	style="height: 1000px;"
+         	id="gridDiv">
+    	</div>
+    	
+    	<!-- for print -->
+    	<div class="custom-table_box" id="printTable" style="display:none;">
+				<div class="custom-table_content">
+					<table id="datatable" class="chart2">
+							<tbody>
+								<tr>
+									<th rowspan="2">연번</th>
+									<th rowspan="2">기관</th>
+									<th colspan="2">일정</th>
+									<th rowspan="2">사업별<br/>구분</th>
+									<th rowspan="2">개인<br/>/단체</th>
+									<th rowspan="2">단체명</th>
+									<th rowspan="2">고객명</th>
+									<th rowspan="2">이용인원<br/>(명)</th>
+									<th colspan="2">성별(명)</th>
+									<th colspan="7">연령(명)</th>
+									<th rowspan="2">지역<br/>(주소)</th>
+									<th colspan="3">연락처</th>
+									<th colspan="5">이용실태</th>
+								</tr>
+								<tr>
+									<th>입실<br/>(시작일)</th>
+									<th>퇴실<br/>(종료일)</th>
+									<th>남</th>
+									<th>여</th>
+									<th>10대<br/>미만</th>
+									<th>10대</th>
+									<th>20대</th>
+									<th>30대</th>
+									<th>40대</th>
+									<th>50대</th>
+									<th>60대<br/>이상</th>
+									<th>유선전화</th>
+									<th>무선전화</th>
+									<th>전자우편</th>
+									<th>이용횟수</th>
+									<th>정보취득<br/>경로</th>
+									<th>이용목적</th>
+									<th>교통수단</th>
+									<th>시설선택<br/>사유</th>	
+								</tr>
+									<c:forEach var="item" items="${list }" varStatus="i">
+										<tr>
+											<td><fmt:formatNumber value="${i.count}"/></td>
+											<td><c:out value="${item.unitNm}"/></td>
+											<td><c:out value="${item.ethrmDt}"/></td>
+											<td><c:out value="${item.lthrmDt}"/></td>
+											<td><c:out value="${item.bsnssTypeNm}"/></td>
+											<td><c:out value="${item.nofprTypeNm}"/></td>
+											<td><c:out value="${item.grpNm}"/></td>
+											<td><c:out value="${item.cstmrNm}"/></td>
+											<td><fmt:formatNumber value="${item.netNofprCnt}"/></td>
+											<td><fmt:formatNumber value="${item.mNofprCnt}"/></td>
+											<td><fmt:formatNumber value="${item.fNofprCnt}"/></td>
+											<td><fmt:formatNumber value="${item.nofpr0Cnt}"/></td>
+											<td><fmt:formatNumber value="${item.nofpr10Cnt}"/></td>
+											<td><fmt:formatNumber value="${item.nofpr20Cnt}"/></td>
+											<td><fmt:formatNumber value="${item.nofpr30Cnt}"/></td>
+											<td><fmt:formatNumber value="${item.nofpr40Cnt}"/></td>
+											<td><fmt:formatNumber value="${item.nofpr50Cnt}"/></td>
+											<td><fmt:formatNumber value="${item.nofpr60Cnt}"/></td>
+											<td><c:out value="${item.cstmrAddr}"/></td>
+											<td><c:out value="${item.cstmrCbleTlno}"/></td>
+											<td><c:out value="${item.cstmrWrlssTlno}"/></td>
+											<td><c:out value="${item.cstmrEmail}"/></td>
+											<td><c:out value="${item.useCntNm}"/></td>
+											<td><c:out value="${item.infoAcqstPathNm}"/></td>
+											<td><c:out value="${item.usePrpsNm}"/></td>
+											<td><c:out value="${item.tfcmnNm}"/></td>
+											<td><c:out value="${item.chcWhyNm}"/></td>
+										</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+				</div> 
+			</div>
+			
+			<div class="none-print" style="margin-top:20px; text-align:right;">
+				<button type="button" class="boot_btn boot_btn-danger register" style="border-color:#d43f3a;float: right;" onclick="self.close()">닫기</button>
+				<button type="button" class="boot_btn boot_btn-primary register" style="float: right;" onclick="fnPrint()">출력</button>
+				<button type="button" class="boot_btn boot_btn-primary register" style="float: right;" onclick="fnExcel()">엑셀</button>
+			</div>
+			
+			<table id="gridTable" style="display:none;"></table>
+			<!-- x-panel -->
+		</div>
+		
+	</div>
+</div>
+</form>
+
+<script>
+	const dataGrid = new ax5.ui.grid();
+	const data = ${dataList};
+	
+	//setting formatter
+	ax5.ui.grid.formatter["number"] = function(){
+		let num = this.value;
+		return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+	
+	$(document).ready(function(){
+		gridInit();
+	});
+	
+	//setGrid
+	function gridInit(){
+		//setConfig
+		dataGrid.setConfig({
+			target: $('[data-ax5grid="data-grid"]'),
+			columns: [
+				{key: "unitNm", label: "기관"},
+				{label: "일정", 
+					columns:[
+						{key: "ethrmDt", label: "입실(시작일)"},
+						{key: "lthrmDt", label: "퇴실(종료일)"}
+					]
+				},
+				{key: "bsnssTypeNm", label: "사업별 구분"},
+				{key: "nofprTypeNm", label: "개인/단체"},
+				{key: "grpNm", label: "단체명"},
+				{key: "cstmrNm", label: "고객명"},
+				{key: "netNofprCnt", label: "이용인원(명)", formatter: "number"},
+				{label: "성별(명)",
+					columns:[
+						{key: "mNofprCnt", label: "남", formatter: "number"},
+						{key: "fNofprCnt", label: "여", formatter: "number"}
+					]
+				},
+				{label: "연령(명)",
+					columns:[
+						{key: "nofpr0Cnt", label: "10대 미만", formatter: "number"},
+						{key: "nofpr10Cnt", label: "10대", formatter: "number"},
+						{key: "nofpr20Cnt", label: "20대", formatter: "number"},
+						{key: "nofpr30Cnt", label: "30대", formatter: "number"},
+						{key: "nofpr40Cnt", label: "40대", formatter: "number"},
+						{key: "nofpr50Cnt", label: "50대", formatter: "number"},
+						{key: "nofpr60Cnt", label: "60대 이상", formatter: "number"}
+					]
+				},
+				{key: "cstmrAddr", label: "지역(주소)"},
+				{label: "연락처",
+					columns:[
+						{key: "cstmrCbleTlno", label: "유선전화"},
+						{key: "cstmrWrlssTlno", label: "무선전화"},
+						{key: "cstmrEmail", label: "전자우편"}
+					]
+				},
+				{label: "이용실태",
+					columns:[
+						{key: "useCntNm", label: "이용횟수", formatter: "number"},
+						{key: "infoAcqstPathNm", label: "정보취득경로"},
+						{key: "usePrpsNm", label: "이용목적"},
+						{key: "tfcmnNm", label: "교통수단"},
+						{key: "chcWhyNm", label: "시설선택사유"}
+					]
+				}
+			],
+			showLineNumber: true,
+			lineNumberColumnWidth: 40,
+			header: {align: "center"},
+			body: {align: "center"}
+		});
+		
+		//setting dataList for ax5ui form
+		const dataList = [];
+		
+		for(var i = 0; i < data.length; i++){
+			dataList[i] = new Object();
+		}
+		
+		for(var i = 0; i < data.length; i++){
+			for(var j = 0; j < data[i].length; j++){
+				dataList[i][data[i][j].key] = data[i][j].content;
+			}
+		}
+		
+		//setData
+		dataGrid.setData(dataList);
+	}
+</script>
+
+<c:import url="/template/iframe_bottom.do" charEncoding="utf-8"/>
