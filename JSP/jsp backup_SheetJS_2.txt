@@ -26,6 +26,7 @@
 <script type="text/javascript" src="/template/ax5ui/dist/ax5ui.all.min.js"></script>
 <script type="text/javascript" src="/template/sheetjs/dist/xlsx.full.min.js"></script>
 <script type="text/javascript" src="/template/table2excel/dist/jquery.table2excel.min.js"></script>
+<script type="text/javascript" src="/template/excellentExport/dist/excellentexport.js"></script>
 
 <style>
 .custom-table_content .chart2 tbody th, 
@@ -57,23 +58,41 @@ function fnExcel(){
 	month = convertFmt(month); day = convertFmt(day); hours = convertFmt(hours); minutes = convertFmt(minutes); seconds = convertFmt(seconds);
 	const curDate = year + "_" + month + "_" + day + "_" + hours + "_" + minutes + "_" + seconds;
 
-	//1. ax5ui export	
+	//1. ax5ui export	(custom export setting problem, xls warning problem)
 // 	dataGrid.exportExcel("stat_cstmr_" + curDate + ".xls");
 
 	const gridTableHtml = dataGrid.exportExcel();
 	$('#gridTable').html(gridTableHtml);
 	
-	//2. sheet JS export
+	//2. sheet JS export (cell type problem[number / date->custom time output])
 // 	const excelData = XLSX.utils.table_to_sheet(document.getElementById('gridTable'));
 // 	const wb = XLSX.utils.book_new();
 // 	XLSX.utils.book_append_sheet(wb, excelData, 'Sheet 1');
 // 	XLSX.writeFile(wb, "stat_cstmr_" + curDate + ".xlsx");
 
-	//3. table2excel export(last commit version : 2020-07-21)
+	//3. table2excel export(last commit version : 2020-07-21)(xls warning problem)
 	$("#gridTable").table2excel({
 		name: "Sheet 1",
 		filename: "stat_cstmr_" + curDate + ".xls"
 	});
+	
+	//4. excellentExport.js export(merged cells output problem, cell type problem)
+// 	const link = document.createElement("a");
+//  	link.download = "";
+// 	link.href = "#";
+	
+// 	function fnExcellentExport(){
+// 		return ExcellentExport.convert({ anchor : link, filename : "stat_cstmr_" + curDate, format : "xlsx" }, [{ name : "Sheet 1", from : { table : "gridTable" }, fixValue: function(value, row, column){
+// 			let fixedValue = value;
+// 			if(value.includes("&nbsp;")){
+// 				fixedValue = value.replace("&nbsp;", "");
+// 			}
+// 			return fixedValue;
+// 		} }]);
+// 	}
+	
+// 	link.addEventListener("click", fnExcellentExport);
+// 	link.click();
 }
 
 function fnPrint(){
