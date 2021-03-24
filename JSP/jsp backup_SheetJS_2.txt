@@ -69,7 +69,7 @@ function fnExcel(){
 // 	XLSX.utils.book_append_sheet(wb, excelData, 'Sheet 1');
 // 	XLSX.writeFile(wb, "stat_cstmr_" + curDate + ".xlsx");
 
-	//3. table2excel export
+	//3. table2excel export(last commit version : 2020-07-21)
 	$("#gridTable").table2excel({
 		name: "Sheet 1",
 		filename: "stat_cstmr_" + curDate + ".xls"
