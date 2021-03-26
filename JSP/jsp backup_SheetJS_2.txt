@@ -83,11 +83,19 @@ function fnExcel(){
 	
 // 	function fnExcellentExport(){
 // 		return ExcellentExport.convert({ anchor : link, filename : "stat_cstmr_" + curDate, format : "xlsx" }, [{ name : "Sheet 1", from : { table : "gridTable" }, fixValue: function(value, row, column){
-// 			let fixedValue = value;
-// 			if(value.includes("&nbsp;")){
-// 				fixedValue = value.replace("&nbsp;", "");
-// 			}
-// 			return fixedValue;
+// 			let v = value.replace(/<br>/gi, "\n");
+// 			let strippedString = v.replace(/(<([^>]+)>)/gi, "");
+// 			strippedString = strippedString.replace("&nbsp;", "");
+			
+// 				if (column < 7 || column > 16){
+// 					return_value = strippedString;
+// 				}else{
+// 					if (isNaN(strippedString) || strippedString == ""){
+// 						return_value = strippedString;
+// 					}else return_value = Number(strippedString);
+// 				}
+				
+// 			return return_value;
 // 		} }]);
 // 	}
 	
