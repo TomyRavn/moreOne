@@ -274,7 +274,7 @@ CREATE TABLE `tb_enterprise_m` (
 
 LOCK TABLES `tb_enterprise_m` WRITE;
 /*!40000 ALTER TABLE `tb_enterprise_m` DISABLE KEYS */;
-INSERT INTO `tb_enterprise_m` VALUES (1,'test11','asdf12!@','시스템 관리자','시스템 관리자','010-1234-1234',25,29,1,'127.0.0.1','2021-04-30 18:17:30',NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `tb_enterprise_m` VALUES (1,'test','test','시스템 관리자','시스템 관리자','010-1234-1234',25,29,1,'127.0.0.1','2021-04-30 18:17:30',NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `tb_enterprise_m` ENABLE KEYS */;
 UNLOCK TABLES;
 
