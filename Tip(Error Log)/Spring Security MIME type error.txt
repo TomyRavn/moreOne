@@ -1,0 +1,13 @@
+에러 내용
+Refused to execute script from 'http://localhost:8000/login' because its MIME type ('text/html') is not executable, 
+and strict MIME type checking is enabled.
+
+발생 내역
+jsp에 <script src="/resource/jqeury.min.js"> 로 리소스 접근시 발생
+
+에러 발생 이유
+spring security 설정 중 security-context.xml 파일 내에 접근 권한 설정 문제.
+resource 경로의 접근이 막혀 발생
+<http pattern="/resources/**" security="none"></http>를 통해 security 조정하여 해결
+
+참조 ) https://directori.tistory.com/129
