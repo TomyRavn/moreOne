@@ -1,0 +1,5 @@
+Login Failure Handler 작업 후
+Bean property 'entrpId' is not writable or has an invalid setter method.
+발생
+
+원인 : handler에 getter, setter 필요
