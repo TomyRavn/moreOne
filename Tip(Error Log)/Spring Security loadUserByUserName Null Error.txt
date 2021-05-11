@@ -1,0 +1,9 @@
+에러 내용
+Caused by: java.lang.NullPointerException at kr.co.asoft.login.service.UserDetailServiceImpl.loadUserByUsername(UserDetailServiceImpl.java:26)
+
+발생 원인
+base-package 스캔 하지 못함
+
+해결 내용
+<context:component-scan base-package="kr.co.asoft/**"/>를 security-context.xml에 추가
+UserDetailServiceImpl의 String 파라미터 값을 username으로 설정
