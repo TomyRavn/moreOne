@@ -1,0 +1,80 @@
+<select id="selectDiagnosisList" parameterType="DiagnosisVO" resultType="DiagnosisVO">
+		SELECT
+			d.DGNSS_IDX,
+			d.MTR_MODEL_IDX,
+			d.MTR_SERIAL_NO,
+			(SELECT CD_NM FROM tb_code_c WHERE CD_IDX = d.DGNSS_CRSE_CD) as DGNSS_CRSE_CD,
+			(SELECT CD_NM FROM tb_code_c WHERE CD_IDX = d.MDL_STTS_CD) as MDL_STTS_CD,
+			d.MTR_ERCRT_FILE_IDX,
+			d.MTR_VLTG_FILE_IDX,
+			d.RGT_IDX,
+			d.RGT_IP,
+			d.RGT_DTTM,
+			d.UDT_IDX,
+			d.UDT_IP,
+			d.UDT_DTTM,
+			d.DLT_IDX,
+			d.DLT_IP,
+			d.DLT_DTTM
+		FROM
+			tb_diagnosis_m AS d
+			<if test="searchList neq null">
+			INNER JOIN
+				(
+					SELECT *
+					FROM
+						tb_diagnosis_result_d
+					WHERE
+						<foreach item="result" collection="searchList">
+							<if test="searchDgnssType neq null">
+								DGNSS_KIND_CD = #{result.searchDgnssType},
+							</if>
+							<if test="searchFlawType neq null">
+								DGNSS_FLAW_CD = #{result.searchFlawType},
+							</if>
+							<if test="searchRsltVal neq null">
+								DGNSS_RSLT_VAL = #{result.searchRsltVal},
+							</if>
+							<if test="@org.springframework.util.StringUtils@isEmpty(searchMinVal) == false and @org.springframework.util.StringUtils@isEmpty(searchMaxVal) == false">
+								DGNSS_RSLT_VAL &gt;= #{result.searchMinVal}, DGNSS_RSLT_VAL &lt;= #{result.searchMaxVal}
+							</if>
+						</foreach>
+				)
+			</if>
+		WHERE
+			d.DLT_DTTM IS NULL
+		<if test="@org.springframework.util.StringUtils@isEmpty(mtrModelIdx) == false">
+			AND d.MTR_MODEL_IDX = #{mtrModelIdx}
+		</if>
+		<if test="startDate neq null and !''.equals(startDate) and endDate neq null and !''.equals(endDate)">
+			AND (d.RGT_DTTM &gt;= STR_TO_DATE(#{startDate}, '%Y-%m-%d') AND d.RGT_DTTM &lt; STR_TO_DATE(#{endDate}, '%Y-%m-%d') + 1)
+		</if>
+		<if test="@org.springframework.util.StringUtils@isEmpty(searchSerialNo) == false">
+			AND d.MTR_SERIAL_NO LIKE CONCAT('%', #{searchSerialNo} ,'%')
+		</if>
+		<if test="searchList neq null">
+		GROUP BY
+			d.DGNSS_IDX
+		</if>
+		ORDER BY
+		<choose>
+			<when test="header == 0 or header == 1">
+				d.RGT_DTTM
+			</when>
+			<when test="header == 2">
+				d.DGNSS_CRSE_CD, d.MDL_STTS_CD
+			</when>
+		</choose>
+		<choose>
+			<when test="order == 0 or order == 1">
+				desc
+			</when>
+			<when test="order == 2">
+				asc
+			</when>
+		</choose>
+		<if test="perPage != 0">
+			LIMIT
+				#{startPage}, #{perPage}
+		</if>
+	</select>
